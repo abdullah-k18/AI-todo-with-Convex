@@ -3,42 +3,50 @@ import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 
 export function GenerateTodosForm() {
-    const [userPrompt, setUserPrompt] = useState("");
-    const [loading, setLoading] = useState(false);
+  const [userPrompt, setUserPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const generateTodos = useAction(api.actions.generateTodos);
+  const generateTodos = useAction(api.actions.generateTodos);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        try {
-            const todos = await generateTodos({ prompt: userPrompt });
-            console.log(todos);
-            setUserPrompt("");
-        } catch (error) {
-            console.log("Error: ", error);
-        } finally {
-            setLoading(false);
-        }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const todos = await generateTodos({ prompt: userPrompt });
+      console.log(todos);
+      setUserPrompt("");
+    } catch (error) {
+      console.log("Error: ", error);
+    } finally {
+      setLoading(false);
     }
-    if(loading) {
-        return <p>Generating todos...</p>
-    }
+  };
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-2">
-                <h2 className="font-semibold text-lg">Generate Tasks with AI 🔮</h2>
-                <label className="text-sm font-semibold" htmlFor="prompt">Prompt</label>
-                <input 
-                    className="p-1 border rounded" 
-                    type="text" 
-                    name="prompt" 
-                    id="prompt" 
-                    value={userPrompt} 
-                    onChange={e => setUserPrompt(e.target.value)} 
-                />
-                <button className="bg-blue-500 p-1 rounded text-white font-semibold" type="submit">Create</button>
-            </div>
+  return (
+    <div className="bg-white shadow-lg rounded-lg p-6">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Generate Tasks with AI 🔮</h2>
+      {loading ? (
+        <p className="text-gray-600">Generating todos...</p>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label htmlFor="prompt" className="text-sm font-semibold text-gray-700">Prompt</label>
+          <input
+            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="text"
+            name="prompt"
+            id="prompt"
+            value={userPrompt}
+            onChange={(e) => setUserPrompt(e.target.value)}
+            placeholder="Enter a prompt to generate tasks"
+          />
+          <button
+            className="bg-blue-600 text-white p-3 rounded-lg font-semibold transition-colors hover:bg-blue-700"
+            type="submit"
+          >
+            Generate
+          </button>
         </form>
-    );
+      )}
+    </div>
+  );
 }
