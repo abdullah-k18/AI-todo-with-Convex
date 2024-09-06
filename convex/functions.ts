@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireUser } from "./helpers";
 
@@ -55,3 +55,20 @@ export const deleteTodo = mutation({
         await ctx.db.delete(args.id);
     }
 })
+
+export const createManyTodos = internalMutation({
+    args: {
+        userId: v.string(),
+        todos: v.array(v.object({title: v.string(), description: v.string()}))
+    },
+    handler: async(ctx, args) => {
+        for (const todo of args.todos) {
+            await ctx.db.insert("todos", {
+                title: todo.title,
+                description: todo.description,
+                completed: false,
+                userId: args.userId
+            })
+        }
+    }
+});
